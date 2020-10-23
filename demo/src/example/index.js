@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 import EmailEditor from '../../../src';
 import sample from './sample.json';
+import $ from 'jquery'
+const send_script = 'https://localhost/_save.php'
 
 const Container = styled.div`
   display: flex;
@@ -44,8 +46,32 @@ const Example = (props) => {
 
   const saveDesign = () => {
     emailEditorRef.current.editor.saveDesign((design) => {
-      console.log('saveDesign', design);
-      alert('Design JSON has been logged in your developer console.');
+      var datas = {}
+      datas.desgin = design;
+
+      $.ajax({
+          url: send_script,
+          type: 'POST',
+          dataType: 'json',
+          data: datas,
+          success: function success(response) {
+            console.log(response)
+              if (response['type'] == 'success') {
+                  // show error message
+                  alert("Nice!", "Email has been sent to: " + inputValue, "success");
+              } else {
+                  alert("Oops!", "An error is occurred", "error");
+              }
+          },
+          error: function error(xhr, err) {
+              // Log errors if AJAX call is failed
+              console.log(xhr);
+              console.log(err);
+          }
+      });
+
+      console.log('saveDesign', datas);
+   
     });
   };
 
@@ -76,6 +102,7 @@ const Example = (props) => {
 
         <button onClick={saveDesign}>Save Design</button>
         <button onClick={exportHtml}>Export HTML</button>
+        <button onClick={onLoad}>Import Design</button>
       </Bar>
 
       <React.StrictMode>
