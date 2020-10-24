@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-
+import base64 from 'base-64';
 import EmailEditor from '../../../src';
 import sample from './sample.json';
 import $ from 'jquery'
-const send_script = 'https://localhost/_save.php'
+
+const send_script = 'http://127.0.0.1:4000'
 
 const Container = styled.div`
   display: flex;
@@ -43,35 +44,38 @@ const Bar = styled.div`
 
 const Example = (props) => {
   const emailEditorRef = useRef(null);
+//  const replacerFunc = () => {
+//     const visited = new WeakSet();
+//     return (key, value) => {
+//       if (typeof value === "object" && value !== null) {
+//         if (visited.has(value)) {
+//           return;
+//         }
+//         visited.add(value);
+//       }
+//       return value;
+//     };
+//   };
+  
+  
 
   const saveDesign = () => {
     emailEditorRef.current.editor.saveDesign((design) => {
-      var datas = {}
-      datas.desgin = design;
+      
+
+      // design.myself = { data: base64.encode(design) }
+      // var datas = JSON.stringify(design, replacerFunc());
 
       $.ajax({
-          url: send_script,
-          type: 'POST',
-          dataType: 'json',
-          data: datas,
-          success: function success(response) {
-            console.log(response)
-              if (response['type'] == 'success') {
-                  // show error message
-                  alert("Nice!", "Email has been sent to: " + inputValue, "success");
-              } else {
-                  alert("Oops!", "An error is occurred", "error");
-              }
-          },
-          error: function error(xhr, err) {
-              // Log errors if AJAX call is failed
-              console.log(xhr);
-              console.log(err);
-          }
+        url: send_script,
+        type: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({data: design}),
+        success: (data) => {
+            console.log(data);
+        }
       });
-
-      console.log('saveDesign', datas);
-   
     });
   };
 
@@ -84,7 +88,7 @@ const Example = (props) => {
   };
 
   const onDesignLoad = (data) => {
-    console.log('onDesignLoad', data);
+    //console.log('onDesignLoad', data);
   };
 
   const onLoad = () => {
