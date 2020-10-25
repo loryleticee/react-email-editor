@@ -2,8 +2,6 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import EmailEditor from '../../../src';
 import Swal from 'sweetalert2';
-//import sample from './sample.json';
-import ComboBox from './search'
 import $ from 'jquery'
 
 const send_script = 'http://127.0.0.1:4000'
@@ -90,6 +88,24 @@ const Example = (props) => {
   };
 
   const designLoad = () => {
+    const fetchFile = async() => { 
+      var myRequest = new Request('http://127.0.0.1:4000', myInit);
+      
+      let response = await fetch(myRequest, myInit)
+      .then((res)=> (res.json()))
+      .then((data) => (data));
+
+      return response
+    }
+
+    const templates = (async () => {
+      let response = await fetchFile();
+      let aNames =  new Map(response.files)
+      let names = Object.fromEntries(aNames);
+
+      return names
+    })();
+    
     const getTemplate = async(template) => { 
       
       let myRequest = new Request('http://127.0.0.1:4000/file/' + template, myInit);
@@ -101,21 +117,10 @@ const Example = (props) => {
       return response
     }
 
-    const fetchFile = async() => { 
-      var myRequest = new Request('http://127.0.0.1:4000', myInit);
-      
-      let response = await fetch(myRequest, myInit)
-      .then((res)=> (res.json()))
-      .then((data) => ({"file": data} ));
-
-      return response
-    }
-
-    fetchFile()
-    
     Swal.fire({
       title: 'Type a template name to load',
-      input: 'text',
+      input: 'select',
+      inputOptions: templates,
       showCancelButton: true,
       confirmButtonText: `Import`,
     }).then((result) => {

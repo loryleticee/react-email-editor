@@ -17,9 +17,11 @@ app.get('/', function (req, res, next) {
   let datas = fs.readdirSync("demo/src/example");
   let files = []
   for (var file of datas) {
-    files.push(file)
+    let name = file.split('.');
+    if(name[1] === 'json')
+      files.push([name[0], name[0]])
   }
-  res.json({files: files})
+  res.json({files})
 })
 
 app.get('/file/:template', function (req, res, next) {
