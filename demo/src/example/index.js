@@ -61,7 +61,6 @@ const Example = (props) => {
         showCancelButton: true,
         confirmButtonText: `Save`,
       }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
           Swal.fire('Saved!', '', 'success');
           $.ajax({
@@ -81,15 +80,47 @@ const Example = (props) => {
 
   const exportHtml = () => {
     emailEditorRef.current.editor.exportHtml((data) => {
+      // const download = async (filename) => {
+      //   console.log(filename)
+      //   let myRequest = new Request('http://127.0.0.1:4000/download/'+ filename, myInit);
+      //   let response  = await fetch(myRequest, myInit)
+      //   return response
+      // }
+
       const { design, html } = data;
-      console.log('exportHtml', html);
-      alert('Output HTML has been logged in your developer console.');
+      //console.log('exportHtml', html);
+      Swal.fire({
+        title: 'Give this template a name',
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: `Save`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          if (result.value !== "") {
+            $.ajax({
+              url: send_script,
+              type: 'POST',
+              contentType: 'application/json',
+              dataType: 'json',
+              data: JSON.stringify({data: html, title: result.value, html: true})
+            });
+            var menu = $('.sc-bwzfXH.jIgEcS')
+            var newDiv = document.createElement("a");
+            newDiv.setAttribute('href', 'demo/src/example/html/'+result.value.toLowerCase()+".html")
+            newDiv.setAttribute('id','download');
+            newDiv.setAttribute('download', '')
+            menu.append(newDiv)
+            setTimeout(function(){newDiv.click()}, 2000);
+          }
+        }
+      })
+      //alert('Output HTML has been logged in your developer console.');
     });
   };
 
   const designLoad = () => {
     const fetchFile = async() => { 
-      var myRequest = new Request('http://127.0.0.1:4000', myInit);
+      let myRequest = new Request('http://127.0.0.1:4000', myInit);
       
       let response = await fetch(myRequest, myInit)
       .then((res)=> (res.json()))
@@ -125,10 +156,12 @@ const Example = (props) => {
       confirmButtonText: `Import`,
     }).then((result) => {
       if (result.isConfirmed) {
-        (async () => {
-          let template = await getTemplate(result.value);
-          emailEditorRef.current.editor.loadDesign(template);
-        })();
+        if (result.value !== "") {
+          (async () => {
+            let template = await getTemplate(result.value);
+            emailEditorRef.current.editor.loadDesign(template);
+          })();
+        }
       }
     });
   }
@@ -152,7 +185,7 @@ const Example = (props) => {
 
         <button onClick={saveDesign}>Save Design</button>
         <button onClick={exportHtml}>Export HTML</button>
-        <button onClick={designLoad}>Import Design</button>
+        <button onClick={designLoad} >Import Design</button>
       </Bar>
 
       <React.StrictMode>

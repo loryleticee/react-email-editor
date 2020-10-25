@@ -24,6 +24,17 @@ The easiest way to use React Email Editor is to install it from NPM and include 
 npm install react-email-editor --save
 ```
 
+
+
+
+## Run
+```
+yarn install 
+```
+```
+forever -m 5 server.js
+```
+
 ## Usage
 
 Require the EmailEditor component and render it with JSX:

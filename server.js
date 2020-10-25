@@ -25,18 +25,32 @@ app.get('/', function (req, res, next) {
 })
 
 app.get('/file/:template', function (req, res, next) {
-  let title = req.params.template
+  let title = req.params.template.toLowerCase()
   res.sendFile(path.join(__dirname, "demo/src/example/" + title +".json"))
 })
+
+// app.get('/download/:template', function(req, res){
+//   let title = req.params.template.toLowerCase()
+//   res.setHeader('Content-disposition', 'attachment; filename=' + title + '.html');
+//   res.setHeader('Content-type', 'text/html');
+//   res.download(path.join(__dirname, "demo/src/example/html/" + title +".html"), title +".html"); 
+// });
 
 app.post('/',function(req, res){
   req.on('data', function (chunk) {
       var result = JSON.parse(chunk);
-        
-      fs.writeFile("demo/src/example/" + result.title + ".json", JSON.stringify(result.data), (err) => {
-        if (err) res.json(err);
-        res.end("Successfully Written to File " + result.title + ".json");
-      });
+      let title = result.title.toLowerCase()
+      if(!result.html) {
+        fs.writeFile("demo/src/example/" + title + ".json", JSON.stringify(result.data), (err) => {
+          if (err) res.json(err);
+          res.end("Successfully Written to File " + title + ".json");
+        });
+      } else {
+        fs.writeFile("demo/src/example/html/" + title + ".html", JSON.stringify(result.data), (err) => {
+          if (err) res.json(err);
+          res.end("Successfully Written to File " + title + ".html");
+        });
+      }
       
       return result;
   });
