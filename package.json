@@ -20,11 +20,12 @@
     "release": "npm run build && npm publish"
   },
   "dependencies": {
-    "base-64": "^1.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "jquery": "^3.5.1"
+    "jquery": "^3.5.1",
+    "path": "^0.12.7",
+    "sweetalert2": "^10.8.1"
   },
   "peerDependencies": {
     "react": "15.x || 16.x"

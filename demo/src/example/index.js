@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import base64 from 'base-64';
 import EmailEditor from '../../../src';
+import Swal from 'sweetalert2';
 import sample from './sample.json';
 import $ from 'jquery'
 
@@ -42,40 +42,41 @@ const Bar = styled.div`
   }
 `;
 
+const myHeaders = new Headers();
+
+const myInit = { 
+  method: 'GET',
+  headers: myHeaders,
+  mode: 'cors',
+  cache: 'default' 
+};
+
 const Example = (props) => {
   const emailEditorRef = useRef(null);
-//  const replacerFunc = () => {
-//     const visited = new WeakSet();
-//     return (key, value) => {
-//       if (typeof value === "object" && value !== null) {
-//         if (visited.has(value)) {
-//           return;
-//         }
-//         visited.add(value);
-//       }
-//       return value;
-//     };
-//   };
-  
-  
 
   const saveDesign = () => {
     emailEditorRef.current.editor.saveDesign((design) => {
-      
-
-      // design.myself = { data: base64.encode(design) }
-      // var datas = JSON.stringify(design, replacerFunc());
-
-      $.ajax({
-        url: send_script,
-        type: 'POST',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: JSON.stringify({data: design}),
-        success: (data) => {
-            console.log(data);
+      Swal.fire({
+        title: 'Give this template a name',
+        input: 'text',
+        showCancelButton: true,
+        confirmButtonText: `Save`,
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          Swal.fire('Saved!', '', 'success');
+          $.ajax({
+            url: send_script,
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({data: design, title: result.value}),
+            success: (data) => {
+                console.log(data);
+            }
+          });
         }
-      });
+      })
     });
   };
 
@@ -87,16 +88,55 @@ const Example = (props) => {
     });
   };
 
+  const designLoad = () => {
+    const getTemplate = async(template) => { 
+      
+      let myRequest = new Request('http://127.0.0.1:4000/file/' + template, myInit);
+      
+      let response = await fetch(myRequest, myInit)
+      .then((res)=> (res.json()))
+      .then((data) => ( data ));
+
+      return response
+    }
+
+    const fetchFile = async() => { 
+      var myRequest = new Request('http://127.0.0.1:4000', myInit);
+      
+      let response = await fetch(myRequest, myInit)
+      .then((res)=> (res.json()))
+      .then((data) => ({"file": data} ));
+
+      return response
+    }
+
+    fetchFile()
+    
+    Swal.fire({
+      title: 'Type a template name to load',
+      input: 'text',
+      showCancelButton: true,
+      confirmButtonText: `Import`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        (async () => {
+          let template = await getTemplate(result.value);
+          emailEditorRef.current.editor.loadDesign(template);
+        })();
+      }
+    });
+  }
+
   const onDesignLoad = (data) => {
-    //console.log('onDesignLoad', data);
+    console.log('onDesignLoad', data);
   };
 
-  const onLoad = () => {
+  const onLoad = () => {    
     emailEditorRef.current.editor.addEventListener(
       'onDesignLoad',
       onDesignLoad
     );
-    emailEditorRef.current.editor.loadDesign(sample);
+    
   };
 
   return (
@@ -106,7 +146,7 @@ const Example = (props) => {
 
         <button onClick={saveDesign}>Save Design</button>
         <button onClick={exportHtml}>Export HTML</button>
-        <button onClick={onLoad}>Import Design</button>
+        <button onClick={designLoad}>Import Design</button>
       </Bar>
 
       <React.StrictMode>
