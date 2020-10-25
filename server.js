@@ -33,26 +33,13 @@ app.post('/',function(req, res){
         
       fs.writeFile("demo/src/example/" + result.title + ".json", JSON.stringify(result.data), (err) => {
         if (err) res.json(err);
-        res.end("Successfully Wrditten to File.");
+        res.end("Successfully Written to File " + result.title + ".json");
       });
       
       return result;
   });
-
-  /*
-  fs.writeFile("demo/src/example/sample3.json", email.data, (err) => {
-    if (err) res.json(err);
-    res.end("Successfully Wrditten to File.");
-  });
-  */
 })
 
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
-
-/*
-fs.readFile("demo/src/example/sample.json", function(err, buf) {
-  console.log(buf.toString());
-});
-*/

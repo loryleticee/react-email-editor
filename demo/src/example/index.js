@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import EmailEditor from '../../../src';
 import Swal from 'sweetalert2';
-import sample from './sample.json';
+//import sample from './sample.json';
+import ComboBox from './search'
 import $ from 'jquery'
 
 const send_script = 'http://127.0.0.1:4000'
