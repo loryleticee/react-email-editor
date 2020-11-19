@@ -7,3 +7,4 @@
 npm-debug.log*
 /server/_config.php
 /server/vendor
+.htaccess
